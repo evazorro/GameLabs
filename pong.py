@@ -63,6 +63,11 @@ while True:
 		paddle_rect.top -= BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_DOWN] and paddle_rect.bottom < SCREEN_HEIGHT:
 		paddle_rect.top += BALL_SPEED
+	# If keys pressed, move opponent's paddle
+	elif pygame.key.get_pressed()[pygame.K_w] and opp_paddle_rect.bottom > 0:
+		opp_paddle_rect.top -= BALL_SPEED
+	elif pygame.key.get_pressed()[pygame.K_s] and opp_paddle_rect.bottom < SCREEN_HEIGHT:
+		opp_paddle_rect.top += BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
 		sys.exit(0)
 		pygame.quit()
@@ -77,16 +82,19 @@ while True:
 	
 	# Ball collision with walls (scoring)
 	if ball_rect.right >= SCREEN_WIDTH:
-		score += 1 # If ball hits opponent's wall, you score a point
+		pygame.time.delay(1000) # If ball hits opponent's wall, pause for a second, then put the ball back in center
+		ball_rect = pygame.Rect((SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), (BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT))
+		score += 1 # You score a point!
 	if ball_rect.left <= 0:
-		opp_score += 1 # If ball hits your wall, opponent scores a point
+		pygame.time.delay(1000) # If ball hits opponent's wall, pause for a second, then put the ball back in center
+		ball_rect = pygame.Rect((SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), (BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT))
+		opp_score += 1 # Opponent scores a point :(
 
-	# Test if the ball is hit by the paddle; if yes reverse speed
+	# Test if the ball is hit by the paddle; if yes reverse speed and play sound
 	if paddle_rect.colliderect(ball_rect):
 		ball_speed[0] = -ball_speed[0]
 		sound = load_sound("pong1.wav")
 		sound.play()
-
 	if opp_paddle_rect.colliderect(ball_rect):
 		ball_speed[0] = -ball_speed[0]
 		sound = load_sound("pong2.wav")
