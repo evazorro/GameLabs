@@ -9,6 +9,7 @@ PADDLE_WIDTH = 10
 PADDLE_HEIGHT = 100
 BALL_SPEED = 10
 BALL_WIDTH_HEIGHT = 16
+LINE_THICKNESS = 3
 
 # Load sounds
 def load_sound(sound_name):
@@ -63,8 +64,8 @@ while True:
 		paddle_rect.top -= BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_DOWN] and paddle_rect.bottom < SCREEN_HEIGHT:
 		paddle_rect.top += BALL_SPEED
-	# If keys pressed, move opponent's paddle
-	elif pygame.key.get_pressed()[pygame.K_w] and opp_paddle_rect.bottom > 0:
+	# If W or S keys pressed, move opponent's paddle
+	elif pygame.key.get_pressed()[pygame.K_w] and opp_paddle_rect.top > 0:
 		opp_paddle_rect.top -= BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_s] and opp_paddle_rect.bottom < SCREEN_HEIGHT:
 		opp_paddle_rect.top += BALL_SPEED
@@ -102,6 +103,9 @@ while True:
 	
 	# Clear screen
 	screen.fill((255, 255, 255))
+
+	# Draw the middle line
+	pygame.draw.line(screen, (255, 0, 0), (SCREEN_WIDTH/2, 0), (SCREEN_WIDTH/2, SCREEN_HEIGHT), LINE_THICKNESS)
 
 	# Render the ball, the paddle, and the score
 	pygame.draw.rect(screen, (0, 0, 0), paddle_rect) # Your paddle
