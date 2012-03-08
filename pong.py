@@ -45,6 +45,45 @@ font = pygame.font.Font(None, 30)
 
 # Game loop
 while True:
+
+	# Win conditions	
+	if score >= 11:
+		pygame.time.delay(1000) # So we can see the score a little longer
+		screen.fill((255, 255, 255))
+		win_message = font.render(str("Left player has won! Press SPACE to play again."), True, (0, 0, 0))
+		screen.blit(win_message, ((SCREEN_WIDTH / 2) - font.size(str("Left player has won! Press SPACE to play again."))[0] / 2, SCREEN_HEIGHT/2))
+		pygame.display.flip()
+		wait = True
+		while wait == True:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+				    pygame.quit()
+				    sys.exit()
+				elif event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_SPACE:
+						score = 0
+						opp_score = 0
+						wait = False
+			pygame.time.delay(20)
+	if opp_score >= 11:
+		pygame.time.delay(1000) # So we can see the score a little longer
+		screen.fill((255, 255, 255))
+		win_message = font.render(str("Right player has won! Press SPACE to play again."), True, (0, 0, 0))
+		screen.blit(win_message, ((SCREEN_WIDTH / 2) - font.size(str("Right player has won! Press SPACE to play again."))[0] / 2, SCREEN_HEIGHT/2))
+		pygame.display.flip()
+		wait = True
+		while wait == True:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+				    pygame.quit()
+				    sys.exit()
+				elif event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_SPACE:
+						score = 0
+						opp_score = 0
+						wait = False
+			pygame.time.delay(20)
+
 	# Event handler
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -64,11 +103,14 @@ while True:
 		paddle_rect.top -= BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_DOWN] and paddle_rect.bottom < SCREEN_HEIGHT:
 		paddle_rect.top += BALL_SPEED
+		
 	# If W or S keys pressed, move opponent's paddle
 	elif pygame.key.get_pressed()[pygame.K_w] and opp_paddle_rect.top > 0:
 		opp_paddle_rect.top -= BALL_SPEED
 	elif pygame.key.get_pressed()[pygame.K_s] and opp_paddle_rect.bottom < SCREEN_HEIGHT:
 		opp_paddle_rect.top += BALL_SPEED
+		
+	# If ESC pressed, quit
 	elif pygame.key.get_pressed()[pygame.K_ESCAPE]:
 		sys.exit(0)
 		pygame.quit()
