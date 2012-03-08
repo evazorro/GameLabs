@@ -10,6 +10,15 @@ PADDLE_HEIGHT = 100
 BALL_SPEED = 10
 BALL_WIDTH_HEIGHT = 16
 
+# Load sounds
+def load_sound(sound_name):
+	try:
+		sound = pygame.mixer.Sound(sound_name)
+	except pygame.error, message:
+		print "Can't load sound: " + sound_name
+		raise SystemExit, message
+	return sound
+
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Pong")
@@ -23,8 +32,12 @@ ball_speed = [BALL_SPEED, BALL_SPEED]
 # Your paddle vertically centered on the left side
 paddle_rect = pygame.Rect((PADDLE_START_X, PADDLE_START_Y), (PADDLE_WIDTH, PADDLE_HEIGHT))
 
-# Scoring: 1 point if you hit the ball, -5 point if you miss the ball
+# Opponent's paddle vertically centered on the right side
+opp_paddle_rect = pygame.Rect((SCREEN_WIDTH - 2*PADDLE_START_X, PADDLE_START_Y), (PADDLE_WIDTH, PADDLE_HEIGHT))
+
+# Scoring: 1 point if you hit the ball
 score = 0
+opp_score = 0 # Opponent's score
 
 # Load the font for displaying the score
 font = pygame.font.Font(None, 30)
@@ -58,25 +71,38 @@ while True:
 	ball_rect.left += ball_speed[0]
 	ball_rect.top += ball_speed[1]
 
-	# Ball collision with rails
+	# Ball collision with top/bottom rails
 	if ball_rect.top <= 0 or ball_rect.bottom >= SCREEN_HEIGHT:
 		ball_speed[1] = -ball_speed[1]
-	if ball_rect.right >= SCREEN_WIDTH or ball_rect.left <= 0:
-		ball_speed[0] = -ball_speed[0]
+	
+	# Ball collision with walls (scoring)
+	if ball_rect.right >= SCREEN_WIDTH:
+		score += 1 # If ball hits opponent's wall, you score a point
+	if ball_rect.left <= 0:
+		opp_score += 1 # If ball hits your wall, opponent scores a point
 
-	# Test if the ball is hit by the paddle; if yes reverse speed and add a point
+	# Test if the ball is hit by the paddle; if yes reverse speed
 	if paddle_rect.colliderect(ball_rect):
 		ball_speed[0] = -ball_speed[0]
-		score += 1
+		sound = load_sound("pong1.wav")
+		sound.play()
+
+	if opp_paddle_rect.colliderect(ball_rect):
+		ball_speed[0] = -ball_speed[0]
+		sound = load_sound("pong2.wav")
+		sound.play()
 	
 	# Clear screen
 	screen.fill((255, 255, 255))
 
 	# Render the ball, the paddle, and the score
 	pygame.draw.rect(screen, (0, 0, 0), paddle_rect) # Your paddle
+	pygame.draw.rect(screen, (0, 0, 0), opp_paddle_rect) # Opponent's paddle
 	pygame.draw.circle(screen, (0, 0, 0), ball_rect.center, ball_rect.width / 2) # The ball
 	score_text = font.render(str(score), True, (0, 0, 0))
-	screen.blit(score_text, ((SCREEN_WIDTH / 2) - font.size(str(score))[0] / 2, 5)) # The score
+	opp_score_text = font.render(str(opp_score), True, (0, 0, 0))
+	screen.blit(score_text, ((SCREEN_WIDTH / 4) - font.size(str(score))[0] / 2, 5)) # Your score
+	screen.blit(opp_score_text, ((SCREEN_WIDTH * 3/4) - font.size(str(opp_score))[0] / 2, 5)) # Opponent's score
 	
 	# Update screen and wait 20 milliseconds
 	pygame.display.flip()
